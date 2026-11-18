@@ -1,19 +1,24 @@
-import express, { type Application, type Request, type Response } from "express";
+import express, {
+  type Application,
+  type Request,
+  type Response,
+} from "express";
 import { Pool } from "pg";
 const app: Application = express();
 const port: number = 3000;
 
 app.use(express.json());
 app.use(express.text());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 
 const pool = new Pool({
-    connectionString: "postgresql://neondb_owner:npg_dOQ9K3gcpquD@ep-bitter-smoke-a1yy6nul.ap-southeast-1.aws.neon.tech/neondb?sslmode=false&channel_binding=require"
+  connectionString:
+    "postgresql://neondb_owner:npg_dOQ9K3gcpquD@ep-bitter-smoke-a1yy6nul.ap-southeast-1.aws.neon.tech/neondb?sslmode=false&channel_binding=require",
 });
 
-const initDB = async()=>{
-    try {
-        await pool.query(`
+const initDB = async () => {
+  try {
+    await pool.query(`
             CREATE TABLE IF NOT EXISTS users(
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(255),
@@ -26,15 +31,13 @@ const initDB = async()=>{
                 updated_at TIMESTAMP DEFAULT NOW()
             );
             `);
-        console.log("Database Created!!")
-    } catch (error) {
-        console.log(error)
-    }
-}
+    console.log("Database Created!!");
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-initDB()
-
-
+initDB();
 
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({
@@ -45,80 +48,89 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.post("/api/v1/users", async (req: Request, res: Response) => {
-    try {
-        const {name, email, password, age}= req.body;
+  try {
+    const { name, email, password, age } = req.body;
 
-        const result = await pool.query(`
-                INSERT INTO users (name, email, password,age) VALUES ($1,$2,$3,$4) RETURNING *`, [name, email, password, age])
+    const result = await pool.query(
+      `
+                INSERT INTO users (name, email, password,age) VALUES ($1,$2,$3,$4) RETURNING *`,
+      [name, email, password, age],
+    );
 
-        console.log(result);
-        res.status(201).json({
-            success: true,
-            message: "User Created!!",
-            data: result.rows[0],
-        });
-    } catch (error:any) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-            error: error,
-        });
-    }
-
+    console.log(result);
+    res.status(201).json({
+      success: true,
+      message: "User Created!!",
+      data: result.rows[0],
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
 });
 
-app.get("/api/v1/users", async(req:Request, res: Response)=>{
-    try {
+app.get("/api/v1/users", async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(`
+                SELECT * FROM users`);
 
-        const result = await pool.query(`
-                SELECT * FROM users`)
-
-        console.log(result);
-        res.status(200).json({
-            success: true,
-            message: "User List!!",
-            data: result.rows,
-        });
-
-    } catch (error:any) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-            error: error,
-        });
-    }
-})
+    console.log(result);
+    res.status(200).json({
+      success: true,
+      message: "User List!!",
+      data: result.rows,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+});
 
 // Find Single User
-app.get("/api/v1/users/:id", async(req: Request, res: Response)=>{
-    try {
-        const {id} = req.params;
-        const result = await pool.query(`
+app.get("/api/v1/users/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `
                 SELECT * FROM users WHERE id = $1
-            `,[id])
+            `,
+      [id],
+    );
 
-        console.log(result);
-        res.status(201).json({
-            success: true,
-            message: "User Fund!!",
-            data: result.rows,
-        });
-    } catch (error:any) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-            error: error,
-        });
+    if (result.rowCount === 0) {
+      res.status(404).json({
+        success: false,
+        message: "User Not Found !",
+      });
     }
-})
+    res.status(201).json({
+      success: true,
+      message: "User Fund!!",
+      data: result.rows,
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+});
 
 // Update User
-app.put("/api/v1/users/:id", async(req: Request, res: Response)=>{
+app.put("/api/v1/users/:id", async (req: Request, res: Response) => {
   try {
-    const {id} = req.params;
-    const {name,password,age,is_acitve} = req.body;
+    const { id } = req.params;
+    const { name, password, age, is_acitve } = req.body;
 
-    const result = await pool.query(`
+    const result = await pool.query(
+      `
         UPDATE users SET
         name = COALESCE($1, name),
         password = COALESCE($2, password),
@@ -126,23 +138,58 @@ app.put("/api/v1/users/:id", async(req: Request, res: Response)=>{
         is_acitve = COALESCE($4, is_acitve),
         updated_at = NOW()
         WHERE id = $5 RETURNING *
-      `,[name ?? null, password ?? null, age?? null, is_acitve ?? null, id])
-      console.log(result);
-       res.status(201).json({
-            success: true,
-            message: "User Updated Successfully!!",
-            data: result.rows[0],
-        });
-
-  } catch (error:any) {
-        res.status(500).json({
-            success: false,
-            message: error.message,
-            error: error,
-        });
+      `,
+      [name ?? null, password ?? null, age ?? null, is_acitve ?? null, id],
+    );
+    if (result.rowCount === 0) {
+      res.status(404).json({
+        success: false,
+        message: "User Not Found !",
+      });
     }
-})
+    res.status(201).json({
+      success: true,
+      message: "User Updated Successfully!!",
+      data: result.rows[0],
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+});
 
+app.delete("/api/v1/users/:id", async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const result = await pool.query(
+      `
+        DELETE FROM users WHERE id = $1
+      `,
+      [id],
+    );
+
+    if (result.rowCount === 0) {
+      res.status(404).json({
+        success: false,
+        message: "User Not Found !",
+      });
+    }
+    res.status(200).json({
+      success: true,
+      message: "User Deleted Successfully!!",
+      // data: result.rows[0],
+    });
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      error: error,
+    });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
