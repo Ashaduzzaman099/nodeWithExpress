@@ -89,6 +89,29 @@ app.get("/api/v1/users", async(req:Request, res: Response)=>{
     }
 })
 
+// Find Single User
+app.get("/api/v1/users/:id", async(req: Request, res: Response)=>{
+    try {
+        const {id} = req.params;
+        const result = await pool.query(`
+                SELECT * FROM users WHERE id = $1
+            `,[id])
+
+        console.log(result);
+        res.status(201).json({
+            success: true,
+            message: "User Fund!!",
+            data: result.rows,
+        });
+    } catch (error:any) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+            error: error,
+        });
+    }
+})
+
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
 });
