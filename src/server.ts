@@ -1,5 +1,5 @@
 import express, { type Application, type Request, type Response } from "express";
-import {Pool} from "pg";
+import { Pool } from "pg";
 const app: Application = express();
 const port: number = 3000;
 
@@ -64,7 +64,7 @@ app.post("/api/v1/users", async (req: Request, res: Response) => {
             error: error,
         });
     }
-  
+
 });
 
 app.get("/api/v1/users", async(req:Request, res: Response)=>{
@@ -79,7 +79,7 @@ app.get("/api/v1/users", async(req:Request, res: Response)=>{
             message: "User List!!",
             data: result.rows,
         });
-        
+
     } catch (error:any) {
         res.status(500).json({
             success: false,
@@ -111,6 +111,38 @@ app.get("/api/v1/users/:id", async(req: Request, res: Response)=>{
         });
     }
 })
+
+// Update User
+app.put("/api/v1/users/:id", async(req: Request, res: Response)=>{
+  try {
+    const {id} = req.params;
+    const {name,password,age,is_acitve} = req.body;
+
+    const result = await pool.query(`
+        UPDATE users SET
+        name = COALESCE($1, name),
+        password = COALESCE($2, password),
+        age = COALESCE($3, age),
+        is_acitve = COALESCE($4, is_acitve),
+        updated_at = NOW()
+        WHERE id = $5 RETURNING *
+      `,[name ?? null, password ?? null, age?? null, is_acitve ?? null, id])
+      console.log(result);
+       res.status(201).json({
+            success: true,
+            message: "User Updated Successfully!!",
+            data: result.rows[0],
+        });
+
+  } catch (error:any) {
+        res.status(500).json({
+            success: false,
+            message: error.message,
+            error: error,
+        });
+    }
+})
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
