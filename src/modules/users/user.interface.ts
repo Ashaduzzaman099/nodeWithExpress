@@ -3,4 +3,5 @@ export interface Iuser {
   email: string;
   password: string;
   age?: number | null;
+  is_acitve?: boolean | null;
 }
