@@ -14,6 +14,12 @@ const createUserIntoDB = async (payLoad: Iuser) => {
   return result;
 };
 
+const getAllUserFromDB = async () => {
+  const result = await pool.query(`SELECT * FROM users`);
+  return result;
+};
+
 export const userService = {
   createUserIntoDB,
+  getAllUserFromDB,
 };
