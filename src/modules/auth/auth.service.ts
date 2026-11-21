@@ -33,8 +33,9 @@ const loginUserIntoDB = async (payLoad: {
     name: user.rows[0].name,
     email: user.rows[0].email,
   };
+  delete user.rows[0].password;
   const accessToken = jwt.sign(JwtPayload, "dshdjsfjdfs", { expiresIn: "1d" });
-  return accessToken;
+  return { accessToken, user: user.rows[0] };
 };
 
 export const authService = {
