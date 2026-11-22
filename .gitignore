@@ -16,6 +16,8 @@ out/
 lib/
 *.tsbuildinfo
 
+logger.txt
+
 # Environment Variables & Secrets
 .env
 .env.local
@@ -74,4 +76,3 @@ pids/
 .DS_Store
 Thumbs.db
 Desktop.ini
-logger.txt
