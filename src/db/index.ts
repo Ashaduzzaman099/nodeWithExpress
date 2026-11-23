@@ -15,6 +15,7 @@ export const initDB = async () => {
                 password VARCHAR(255) NOT NULL,
                 age INT,
                 is_acitve BOOLEAN DEFAULT true,
+                role VARCHAR DEFAULT 'user',
 
                 created_at TIMESTAMP DEFAULT NOW(),
                 updated_at TIMESTAMP DEFAULT NOW()
@@ -33,7 +34,7 @@ export const initDB = async () => {
           updated_at TIMESTAMP DEFAULT NOW()
 
         )
-      `)
+      `);
     console.log("Database Created!!");
   } catch (error) {
     console.log(error);
