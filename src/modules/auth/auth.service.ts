@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { config } from "../../config";
 import { pool } from "../../db";
+import jwt from 'jsonwebtoken';
 
 const loginUserIntoDB = async (payLoad: {
   email: string;
@@ -33,6 +33,7 @@ const loginUserIntoDB = async (payLoad: {
     id: user.rows[0].id,
     name: user.rows[0].name,
     email: user.rows[0].email,
+    role: user.rows[0].role,
   };
   delete user.rows[0].password;
   const accessToken = jwt.sign(JwtPayload, config.jwt_secret, {
