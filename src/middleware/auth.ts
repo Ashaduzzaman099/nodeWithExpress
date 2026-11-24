@@ -2,8 +2,9 @@ import type { NextFunction, Request, Response } from "express";
 import jwt, { type JwtPayload } from "jsonwebtoken";
 import { config } from "../config";
 import { pool } from "../db";
+import type { Role } from "../types";
 
-const auth = (...roles: any) => {
+const auth = (...roles: Role[]) => {
 
   return async (req: Request, res: Response, next: NextFunction) => {
     // console.log("This is protected route!");
@@ -42,7 +43,7 @@ const auth = (...roles: any) => {
           message: "Forbidden! You do not have permission to access this resource.",
         });
       }
-    console.log(decode.role)
+    
 
     req.user = decode;
 
