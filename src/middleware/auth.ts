@@ -4,7 +4,7 @@ import { config } from "../config";
 import { pool } from "../db";
 
 const auth = (...roles: any) => {
-  console.log(roles);
+
   return async (req: Request, res: Response, next: NextFunction) => {
     // console.log("This is protected route!");
     // console.log(req.headers.authorization);
@@ -35,6 +35,14 @@ const auth = (...roles: any) => {
         message: "Forbidden !!",
       });
     }
+
+    if (roles.length > 0 && !roles.includes(user.rows[0].role)) {
+        res.status(403).json({
+          success: false,
+          message: "Forbidden! You do not have permission to access this resource.",
+        });
+      }
+    console.log(decode.role)
 
     req.user = decode;
 

@@ -5,7 +5,7 @@ import { userController } from "./user.controller";
 const router = Router();
 
 router.post("/", userController.createUser);
-router.get("/", auth("admin", "user"), userController.getAllUser);
+router.get("/", auth("admin", "agent"), userController.getAllUser);
 // Find Single User
 router.get("/:id", userController.getSingleUser);
 // Update User
