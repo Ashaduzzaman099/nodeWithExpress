@@ -3,6 +3,7 @@ import express, {
   type Request,
   type Response,
 } from "express";
+import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import logger from "./middleware/logger";
 import { authRouter } from "./modules/auth/auth.route";
 import { profileRoute } from "./modules/profiles/profile.route";
@@ -24,5 +25,5 @@ app.get("/", (req: Request, res: Response) => {
     author: "Ashik",
   });
 });
-
+app.use(globalErrorHandler);
 export default app;
