@@ -9,7 +9,14 @@ import { authRouter } from "./modules/auth/auth.route";
 import { profileRoute } from "./modules/profiles/profile.route";
 import { userRoute } from "./modules/users/user.route";
 const app: Application = express();
+import cors from "cors";
 
+var corsOptions = {
+  origin: ['http://localhost:3000'],
+  optionsSuccessStatus: 200 
+}
+
+app.use(cors(corsOptions))
 app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
