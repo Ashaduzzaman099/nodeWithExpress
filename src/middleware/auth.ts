@@ -24,7 +24,7 @@ const auth = (...roles: Role[]) => {
     `,
         [decode.email],
       );
-      console.log(user.rows[0]);
+      // console.log(user.rows[0]);
       if (user.rowCount === 0) {
         return res.status(404).json({
           success: false,

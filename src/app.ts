@@ -10,6 +10,7 @@ import { profileRoute } from "./modules/profiles/profile.route";
 import { userRoute } from "./modules/users/user.route";
 const app: Application = express();
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 var corsOptions = {
   origin: ['http://localhost:3000'],
@@ -17,6 +18,7 @@ var corsOptions = {
 }
 
 app.use(cors(corsOptions))
+app.use(cookieParser())
 app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
